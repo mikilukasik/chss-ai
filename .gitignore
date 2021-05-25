@@ -1,0 +1,7 @@
+node_modules
+data
+data/to-learn
+lessons
+.DS_Store
+results
+archives
