@@ -4,7 +4,7 @@ const brain = require('brain.js');
 const StreamArray = require( 'stream-json/streamers/StreamArray');
 
 const lessonType = 'eng_2500+_0-120_chkmt-mix';
-const iterations = 20000;
+const iterations = 100;
 const logPeriod = 2;
 
 const lessonNames = [
@@ -26,8 +26,6 @@ lessonNames.forEach((lessonName) => {
   });
 
   jsonStream.on('end', () => {
-    // if (lesson.length > 3000000) lesson.length = 3000000;
-
     const network = new brain.NeuralNetwork();
     console.log(lesson.length, lesson[0]);
     let started = Date.now();
