@@ -21,7 +21,9 @@ lessonNames.forEach((lessonName) => {
   const lesson = [];
   const jsonStream = StreamArray.withParser();
   fs.createReadStream(`${sourceDir}/${lessonName}.json`).pipe(jsonStream.input);
+
   jsonStream.on('data', ({ key, value }) => {
+    if (key % 100000 === 0) console.log(`${key} lines loaded`)
     lesson[key] = value;
   });
 
