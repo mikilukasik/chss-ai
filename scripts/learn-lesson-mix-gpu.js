@@ -28,7 +28,7 @@ lessonNames.forEach((lessonName) => {
   });
 
   jsonStream.on('end', () => {
-    // if (lesson.length > 3000000) lesson.length = 3000000;
+    if (lesson.length > 3000000) lesson.length = 3000000;
 
     const network = new brain.NeuralNetworkGPU();
     console.log(lesson.length, lesson[0]);
