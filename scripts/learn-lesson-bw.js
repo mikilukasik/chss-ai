@@ -3,8 +3,8 @@ const path = require('path');
 const brain = require('brain.js');
 const StreamArray = require( 'stream-json/streamers/StreamArray');
 
-const lessonType = 'eng_2100+_20-100-moves_chckmt';
-const iterations = 100;
+const lessonType = 'eng_2500+_0-120_chkmt';
+const iterations = 10000;
 const logPeriod = 2;
 
 const lessonNames = [
@@ -22,8 +22,8 @@ lessonNames.forEach((lessonName) => {
   const lesson = [];
   const jsonStream = StreamArray.withParser();
   fs.createReadStream(`${sourceDir}/${lessonName}.json`).pipe(jsonStream.input);
-  jsonStream.on('data', ({key, value}) => {
-    lesson[key] = value;
+  jsonStream.on('data', ({ key, value: { input, output }}) => {
+    lesson[key] = { input, output: [output[2]] };
   });
 
   jsonStream.on('end', () => {
@@ -35,11 +35,13 @@ lessonNames.forEach((lessonName) => {
     network.train(lesson, { log: ({ error, iterations: _i }) => {
       const elapsed = Date.now() - started;
       const msPerIteration = elapsed / _i;
+      const speed = `${(60 * 60 * 1000 / msPerIteration).toFixed(1)}/h`;
       const remainingIterations = iterations - _i;
       const remainingHours = (msPerIteration * remainingIterations / 1000 / 60 / 60).toFixed(2);
+      
     
-      lastLog = { error, iterations, lessonType, lessonName };
-      console.log({ error, completed: `${_i} / ${iterations}`, remainingHours, lessonName });
+      lastLog = { lessonType, lessonName, error, iterations, speed };
+      console.log({ lessonName, error, completed: `${_i} / ${iterations}`, speed, remainingHours });
     }, logPeriod, iterations, errorThresh: 0.0005 });
     
     fs.writeFileSync(path.resolve(destinationDir, `${lessonName}.js`), network.toFunction().toString(), 'utf8');

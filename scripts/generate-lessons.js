@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const folderName = 'eng_2500+_0-120_chkmt';
+const folderName = 'otb_2100+_chkmt';
 
 const sourceDir = path.resolve(`data/${folderName}/`);
 const destinationDir = path.resolve(`lessons/${folderName}/`);
