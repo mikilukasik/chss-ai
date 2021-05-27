@@ -19,16 +19,10 @@ fs.mkdirSync(destinationDir);
 
 lessonNames.forEach((lessonName) => {
   const lesson = [];
-  const jsonStream = StreamArray.withParser();
-  fs.createReadStream(`${sourceDir}/${lessonName}.json`).pipe(jsonStream.input);
-
-  jsonStream.on('data', ({ key, value }) => {
-    if (key % 100000 === 0) console.log(`${key} lines loaded`)
-    lesson[key] = value;
-  });
-
-  jsonStream.on('end', () => {
-    if (lesson.length > 3000000) lesson.length = 3000000;
+  let learning = false;
+  const learn = () => {
+    if (learning) return;
+    learning = true;
 
     const network = new brain.NeuralNetworkGPU();
     console.log(lesson.length, lesson[0]);
@@ -51,5 +45,19 @@ lessonNames.forEach((lessonName) => {
     fs.writeFileSync(path.resolve(destinationDir, `${lessonName}.json`), JSON.stringify(network.toJSON()), 'utf8');
     fs.writeFileSync(path.resolve(destinationDir, `${lessonName}-meta.json`), JSON.stringify({ lastLog }, null, 2), 'utf8');
     fs.writeFileSync(path.resolve(destinationDir, `${lessonName}-with-meta.js`), `${network.toFunction().toString()}\n\n/*\n${JSON.stringify(lastLog, null, 2)}\n*/`, 'utf8');
+  };
+
+  const jsonStream = StreamArray.withParser();
+  fs.createReadStream(`${sourceDir}/${lessonName}.json`).pipe(jsonStream.input);
+
+  jsonStream.on('data', ({ key, value }) => {
+    if (key % 100000 === 0) console.log(`${key} lines loaded`)
+    if (key > 4000000) {
+      jsonStream.destroy();
+      return learn();
+    }
+    lesson[key] = value;
   });
+
+  jsonStream.on('end', learn);
 });
