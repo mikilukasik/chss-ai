@@ -11,7 +11,7 @@ const lessonNames = [
   'tables2valuesMix',
 ];
 
-const sourceDir = `lessons/${lessonType}/`;
+const sourceDir = `lessons/${lessonType}`;
 const destinationDir = path.resolve(`results/${lessonType}-i${iterations}/`);
 
 if (fs.existsSync(destinationDir)) throw new Error('Destination lessonType already exists.');
